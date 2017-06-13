@@ -29,7 +29,7 @@ class Grizzly(Bear):
 class Mother(Bear):
     name = 'Mother'
     def move( self, roll ):
-        if roll in ( 2, 3, 4, 5 ):
+        if roll in ( 1, 2, 5, 6 ):
             if self.has_cub:
                 self.square += 1
             else:    
@@ -37,7 +37,7 @@ class Mother(Bear):
                 if self.square >= self.cub_square and self.has_cub is False:
                     self.square = self.cub_square
                     self.has_cub = True
-        else:
+        elif self.has_cub is False:
             self.cub_square += 1
         return self.square
         
@@ -52,6 +52,13 @@ class Kodiak(Bear):
     def move( self, roll ):
         if roll <= self.rank:
             self.square += 2
+        return self.square
+        
+class Teddy(Bear):
+    name = 'Teddy'
+    def move( self, roll ):
+        if roll <= 3:
+            self.square += ( ( self.rank ) / 2 ) + 1
         return self.square
         
 class Panda(Bear):
@@ -86,6 +93,30 @@ class Polar(Bear):
         self.rank = 0
         self.tokens = 1
         
+class Sun(Bear):
+    name = 'Sun'
+    def move( self, roll ):
+        if roll >3:
+            self.square += self.tokens
+            self.tokens = 1
+        else:
+            self.tokens += 1
+        return self.square
+        
+    def reset( self ):
+        self.square = 0
+        self.rank = 0
+        self.tokens = 2
+
+class Spectacled(Bear):
+    name = 'Spectacled'
+    def move( self, roll ):
+        if roll in ( 3, 4 ):
+            self.square += 1
+        elif roll in ( 5, 6 ):
+            self.square += 2
+        return self.square       
+
 import random
 import numpy
 import argparse
@@ -102,8 +133,11 @@ finish = args.length
 racers = args.racers
 print args
 bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak() ], racers )
+bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak(), Sun(), Spectacled(), Teddy()  ], racers )
 
 bears = random.sample([ Panda(), newPanda() ], racers )
+
+random.shuffle(bears)
 
 if args.standalone:
     for bear in bears:
