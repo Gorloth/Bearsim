@@ -1,11 +1,12 @@
 class Bear:
     def __init__(self):
         self.reset()
-        self.places = {}
+        self.places = [ 0 for _ in range(racers) ]
         
     def reset( self ):
         self.square = 0
         self.rank = 1
+        self.finished = False
 
 class Black(Bear):
     name = 'Black'
@@ -43,8 +44,7 @@ class Mother(Bear):
         return self.square
         
     def reset( self ):
-        self.square = 0
-        self.rank = 0
+        Bear.reset(self)
         self.cub_square = 7
         self.has_cub = False
 
@@ -76,8 +76,7 @@ class Panda(Bear):
         return self.square
         
     def reset( self ):
-        self.square = 0
-        self.rank = 0
+        Bear.reset(self)
         self.stopped = False
 
 class Polar(Bear):
@@ -90,8 +89,7 @@ class Polar(Bear):
         return self.square
         
     def reset( self ):
-        self.square = 0
-        self.rank = 0
+        Bear.reset(self)
         self.tokens = 1
         
 class Sun(Bear):
@@ -105,8 +103,7 @@ class Sun(Bear):
         return self.square
         
     def reset( self ):
-        self.square = 0
-        self.rank = 0
+        Bear.reset(self)
         self.tokens = 2
 
 class Spectacled(Bear):
@@ -136,10 +133,8 @@ racers = args.racers
 if args.seed is not 0:
     random.seed( args.seed )
 print args
-bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak() ], racers )
-bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak(), Sun(), Spectacled(), Teddy()  ], racers )
 
-bears = random.sample([ Panda(), newPanda() ], racers )
+bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak(), Sun(), Spectacled(), Teddy()  ], racers )
 
 random.shuffle(bears)
 
@@ -163,10 +158,10 @@ else:
     for bear in bears:
         results[bear.name] = 0
     for j in range( attempts ):
-        finished = False
+        place = 0
         for bear in bears:
             bear.reset()
-        while finished is False:
+        while place < racers:
             roll = random.randint(1, 6)
             for bear in bears:
                 bear.move(roll)
@@ -176,13 +171,13 @@ else:
             for bear in rank:
                 if bear.square != previous:
                     current_place = rank.index(bear) + 1
-                if bear.square >= finish:
-                    finished = True
-                    results[bear.name] += 1
-                    break
+                if bear.square >= finish and not bear.finished:
+                    bear.places[place] += 1
+                    place += 1
+                    bear.finished = True
                 bear.rank = current_place
                 previous = bear.square
-        #for bear in bears:
-        #    if bear.square >= finish:
-        #        results[bear.name] += 1
-    print results
+    for bear in bears:
+        print bear.name
+        print bear.places, bear.places[0]*4+bear.places[1]*3+bear.places[2]*2+bear.places[3]
+            
