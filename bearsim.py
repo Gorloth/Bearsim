@@ -1,6 +1,7 @@
 class Bear:
     def __init__(self):
         self.reset()
+        self.places = {}
         
     def reset( self ):
         self.square = 0
@@ -126,11 +127,14 @@ parser.add_argument('-a', '--attempts', default=10000, type=int, help='Number of
 parser.add_argument('-l', '--length', default=15, type=int, help='lenght of the board')
 parser.add_argument('-r', '--racers', default=5, type=int, help='number of racers')
 parser.add_argument('-s', '--standalone', action='store_true', help='flag to do a standalone simulation (runs individual racers and gives stats)')
+parser.add_argument('-d', '--seed', default=0, type=int, help='number of racers')
 args = parser.parse_args()
 
 attempts = args.attempts
 finish = args.length
 racers = args.racers
+if args.seed is not 0:
+    random.seed( args.seed )
 print args
 bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak() ], racers )
 bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak(), Sun(), Spectacled(), Teddy()  ], racers )
@@ -174,9 +178,11 @@ else:
                     current_place = rank.index(bear) + 1
                 if bear.square >= finish:
                     finished = True
+                    results[bear.name] += 1
+                    break
                 bear.rank = current_place
                 previous = bear.square
-        for bear in bears:
-            if bear.square >= finish:
-                results[bear.name] += 1
+        #for bear in bears:
+        #    if bear.square >= finish:
+        #        results[bear.name] += 1
     print results
