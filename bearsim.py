@@ -120,21 +120,11 @@ import numpy
 import argparse
 from pprint import pprint
 
-def calculate_places( bears ):
-    global place
-    
-    rank = [ [] for _ in range(finish + 1) ]
-    for bear in bears:
-        rank[min(bear.square, finish)].append(bear)
-    rank.reverse()
+def calculate_places( board, bears ):
     current_place = 1
     square_place = 1
-    for square in rank:
+    for square in reversed( board ):
         for bear in square:
-            if bear.square >= finish and not bear.finished:
-                bear.places[place] += 1
-                place += 1
-                bear.finished = True
             bear.rank = current_place
             square_place += 1
         current_place = square_place
@@ -181,11 +171,27 @@ else:
         place = 0
         for bear in bears:
             bear.reset()
+        
+        board = [ [] for _ in range(finish + 1) ]
+        for bear in bears:
+            board[0].append(bear)
+            
         while place < racers:
             roll = random.randint(1, 6)
             for bear in bears:
-                bear.move(roll)
-                calculate_places( bears )
+                if bear.finished:
+                    continue
+                prev_space = bear.square
+                new_space = bear.move(roll)
+                if prev_space != new_space:
+                    new_space = min( new_space, finish )
+                    board[prev_space].remove(bear)
+                    board[new_space].append(bear)
+                    if bear.square >= finish:
+                        bear.places[place] += 1
+                        place += 1
+                        bear.finished = True
+                    calculate_places( board, bears )
     for bear in bears:
         print bear.name
         print bear.places, bear.places[0]*4+bear.places[1]*3+bear.places[2]*2+bear.places[3]
