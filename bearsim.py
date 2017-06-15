@@ -142,9 +142,12 @@ finish = args.length
 racers = args.racers
 if args.seed is not 0:
     random.seed( args.seed )
+    numpy.random.seed( args.seed )
 print args
 
-bears = random.sample([ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak(), Sun(), Spectacled(), Teddy()  ], racers )
+all_bears = [ Black(), Sloth(), Grizzly(), Mother(), Panda(), Polar(), Kodiak(), Sun(), Spectacled(), Teddy() ]
+
+bears = random.sample(all_bears, racers )
 
 random.shuffle(bears)
 
@@ -192,7 +195,7 @@ else:
                         place += 1
                         bear.finished = True
                     calculate_places( board, bears )
-    for bear in bears:
+    for bear in all_bears:
         print bear.name
         print bear.places, bear.places[0]*4+bear.places[1]*3+bear.places[2]*2+bear.places[3]
             
