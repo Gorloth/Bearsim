@@ -51,6 +51,7 @@ class Mother(Bear):
 class Kodiak(Bear):
     name = 'Kodiak'
     def move( self, roll ):
+        calculate_places( board, self )
         if roll <= self.rank:
             self.square += 2
         return self.square
@@ -58,6 +59,7 @@ class Kodiak(Bear):
 class Teddy(Bear):
     name = 'Teddy'
     def move( self, roll ):
+        calculate_places( board, self )
         if roll > 3:
             self.square += ( ( self.rank ) / 2 ) + 1
         return self.square
@@ -123,11 +125,11 @@ from pprint import pprint
 def calculate_places( board, bears ):
     current_place = 1
     square_place = 1
-    for square in reversed( board ):
-        for bear in square:
+    for idx, bear_count in enumerate(reversed( board )):
+        if bear.square == finish - idx:
             bear.rank = current_place
-            square_place += 1
-        current_place = square_place
+            return
+        current_place += bear_count
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-a', '--attempts', default=10000, type=int, help='Number of simulated rounds to run')
@@ -175,9 +177,9 @@ else:
         for bear in bears:
             bear.reset()
         
-        board = [ [] for _ in range(finish + 1) ]
+        board = [ 0 for _ in range(finish + 1) ]
         for bear in bears:
-            board[0].append(bear)
+            board[bear.square] += 1
             
         while place < racers:
             roll = random.randint(1, 6)
@@ -188,13 +190,13 @@ else:
                 new_space = bear.move(roll)
                 if prev_space != new_space:
                     new_space = min( new_space, finish )
-                    board[prev_space].remove(bear)
-                    board[new_space].append(bear)
+                    board[prev_space] -= 1
+                    board[new_space] += 1
                     if bear.square >= finish:
                         bear.places[place] += 1
                         place += 1
                         bear.finished = True
-                    calculate_places( board, bears )
+                    #calculate_places( board, bears )
     for bear in all_bears:
         print bear.name
         print bear.places, bear.places[0]*4+bear.places[1]*3+bear.places[2]*2+bear.places[3]
